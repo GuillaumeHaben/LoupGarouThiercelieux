@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Run {
 	
-	private static Joueur[] joueurs;
+	private static ArrayList<Joueur> joueurs = new ArrayList<Joueur>();
 	private static HashMap<Joueur, Integer> votes = new HashMap<Joueur, Integer>();
 	private static Joueur victime;
 	
@@ -20,14 +20,14 @@ public class Run {
 		System.out.println("Le jour se lève sur le village. Tous les villageois se réveillent sauf...");
 		System.out.println(victime.getPrenom() + "!");
 		System.out.println("Les villageois sont donc amenés à voter pour tuer l'un d'entre eux.");
-		menu();
+		menu("jour");
 		System.out.println("Les villageois ont tués " + victime.getPrenom() + "!");
 	}
 	
 	public static void nuit() {
 		System.out.println("La nuit tombe sur le village. Tous les villageois s'endorment.");
 		System.out.println("Les loups garous vont être appelés pour désigner une victime...");
-		menu();		
+		menu("nuit");		
 	}
 	
 	public static void choisirMort(ArrayList joueursATuer) {
@@ -38,30 +38,63 @@ public class Run {
 		else {
 		    Random rand = new Random();
 		    int hasard = rand.nextInt(nombreJoueursATuer + 1);
-		    victime = (Joueur) joueursATuer.get(hasard);
+		    victime = (Joueur) joueursATuer.get(hasard-1);
 		}
+		joueurs.remove(victime);
 		
 	}
 	
-	public static void menu() {
+	public static void menu(String etat) {
 		votes.clear();
-		for (int i = 0; i < joueurs.length; i++) {
-			System.out.println("A toi de jouer " + joueurs[i].getPrenom() + ". Appuie sur une touche pour commencer.");
+		for (Joueur joueur : joueurs) {
+			
+		
+			System.out.println("A toi de jouer " + joueur.getPrenom() + ". Appuie sur une touche pour commencer.");
 			Scanner sc = new Scanner(System.in);
-			String wait = sc.next();
-			if (joueurs[i].isLoupGarou() == 1) {
+			if (etat.equals("jour")) {
 				System.out.println("Choisi une victime parmi les joueurs encors en vie :");
-				for (int j = 0; j < joueurs.length; j++) {
-					System.out.println("[" + j + "] Joueur n°" + j + " : " + joueurs[j].getPrenom());
+				for (Joueur j : joueurs) {
+					System.out.println("[" + j.getId() + "] Joueur n°" + j.getId() + " : " + j.getPrenom());// int j ++
 				}
 				int numJoueur = sc.nextInt();
-				System.out.println("Tu souhaites tuer : " + joueurs[numJoueur].getPrenom() + ".");
+				for (Joueur j : joueurs) {
+					if (numJoueur == j.getId()) {
+						System.out.println("Tu souhaites tuer : " + j.getPrenom() + ".");
+						if (votes.get(j) == null) {
+							votes.put(j, 1);
+						}
+						else {
+							votes.put(j, votes.get(j) + 1);
+						}
+						break;
+					}
+				}
 				//Mettre à jour les votes
-				votes.put(joueurs[numJoueur], votes.get(joueurs[numJoueur]) + 1); // si existe pas
-
 			}
-			if (joueurs[i].isLoupGarou() == 0) {
-				System.out.println("Reste endormi ;)");
+			if (etat.equals("nuit")) {
+				if (joueur.isLoupGarou() == 1) {
+					System.out.println("Choisi une victime parmi les joueurs encors en vie :");
+					for (Joueur j : joueurs) {
+						System.out.println("[" + j.getId() + "] Joueur n°" + j.getId() + " : " + j.getPrenom());
+					}
+					int numJoueur = sc.nextInt();
+					for (Joueur j : joueurs) {
+						if (numJoueur == j.getId()) {
+							System.out.println("Tu souhaites tuer : " + j.getPrenom() + ".");
+							if (votes.get(j) == null) {
+								votes.put(j, 1);
+							}
+							else {
+								votes.put(j, votes.get(j) + 1);
+							}
+						}
+						break;
+					}
+	
+				}
+				if (joueur.isLoupGarou() == 0) {
+					System.out.println("Reste endormi ;)");
+				}
 			}
 			//effacer écran
 		} 
@@ -80,37 +113,36 @@ public class Run {
 		Scanner sc = new Scanner(System.in);
 		int nbJoueur = sc.nextInt();
 		System.out.println("Très bien : " + nbJoueur + " joueurs !");
-		joueurs = new Joueur[nbJoueur];
 		for (int i = 0; i < nbJoueur; i++) {
-			joueurs[i] = new Joueur();
+			joueurs.add(new Joueur(i));
 		} 
 	}
 	
 	public static void choixPrenom() {
-		for (int i = 0; i < joueurs.length; i++) {
-			System.out.println("Joueur n°" + i + " : Comment t'appelles tu ?");
+		for (Joueur joueur : joueurs) {
+			System.out.println("Joueur n°" + joueur.getId() + " : Comment t'appelles tu ?"); // int i
 			Scanner sc = new Scanner(System.in);
 			String prenom = sc.next();
 			System.out.println("Merci pour l'info " + prenom + " !");
-			joueurs[i].setPrenom(prenom);
-			joueurs[i].setEnVie(true);
+			joueur.setPrenom(prenom);
+			joueur.setEnVie(true);
 		}
 	}
 	
 	public static void assignerRole() {
-		for (int i = 0; i < joueurs.length; i++) {
+		for (Joueur joueur : joueurs) {
 		    Random rand = new Random();
-			joueurs[i].setRole(rand.nextInt(2));
+			joueur.setRole(rand.nextInt(2));
 		}
 	}
 
 	private static void devoilerRole() {
-		for (int i = 0; i < joueurs.length; i++) {
-			System.out.print(joueurs[i].getPrenom() + " ! Tu es un ");
-			if (joueurs[i].isLoupGarou() == 1) {
+		for (Joueur joueur : joueurs) {
+			System.out.print(joueur.getPrenom() + " ! Tu es un ");
+			if (joueur.isLoupGarou() == 1) {
 				System.out.print("Loup-Garou");
 			}
-			if (joueurs[i].isLoupGarou() == 0) {
+			if (joueur.isLoupGarou() == 0) {
 				System.out.print("Villageois");
 			}
 			System.out.println();
@@ -124,16 +156,14 @@ public class Run {
 		devoilerRole();
 		while(nombreLoupGarou() != 0 && nombreVillageois() != 0) {
 			tour();
-			//si Loup Garou = 0 break;
-			//si Villageois = 0 break;
 		}
 		
 	}
 
 	private static int nombreVillageois() {
 		int villageois = 0;
-		for (int i = 0; i < joueurs.length; i++) {
-			if (joueurs[i].getRole() == 0) {
+		for (Joueur joueur : joueurs) {
+			if (joueur.getRole() == 0) {
 				villageois++;
 			}
 		}
@@ -142,8 +172,8 @@ public class Run {
 
 	private static int nombreLoupGarou() {
 		int loupgarous = 0;
-		for (int i = 0; i < joueurs.length; i++) {
-			if (joueurs[i].getRole() == 0) {
+		for (Joueur joueur : joueurs) {
+			if (joueur.getRole() == 0) {
 				loupgarous++;
 			}
 		}

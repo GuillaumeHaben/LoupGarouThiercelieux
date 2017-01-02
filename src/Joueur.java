@@ -1,13 +1,21 @@
 
 public class Joueur {
+	private int id;
 	private String prenom;
 	private int role; // final pour constante
 	private boolean enVie;
 	
-	public Joueur() {
-		
+	public Joueur(int i) {
+		this.id = i;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getPrenom() {
 		return prenom;
 	}
